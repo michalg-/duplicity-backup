@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  backup:
+    image: frooko/duplicity-backup:latest
+    restart: unless-stopped
+    volumes:
+      - /opt/stacks:/source/stacks
+      - /opt/dockge:/source/dockge
+      - ./cache:/root/.cache
+    env_file:
+      - .env
