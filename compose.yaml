@@ -9,3 +9,10 @@ services:
       - ./cache:/root/.cache
     env_file:
       - .env
+    environment:
+      # Optional: override built-in exclude patterns (whitespace/newline separated).
+      # Leave unset to use defaults baked into backup.sh.
+      BACKUP_EXCLUDES: |
+        **/.*
+        /source/stacks/jellyfin/config/data/metadata
+        /source/stacks/adwireguard/adguard/opt-adguard-work/data/querylog.json*
