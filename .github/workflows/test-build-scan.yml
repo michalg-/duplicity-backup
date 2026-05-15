@@ -1,0 +1,51 @@
+name: test build & scan
+
+on:
+  pull_request:
+  push:
+    branches:
+      - 'test/**'
+  workflow_dispatch:
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v4.0.0
+
+      - name: Build image (amd64, load locally)
+        uses: docker/build-push-action@v7.1.0
+        with:
+          context: .
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: duplicity-backup:scan-target
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Trivy scan
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: duplicity-backup:scan-target
+          format: table
+          severity: CRITICAL,HIGH,MEDIUM,LOW
+          exit-code: '0'
+          ignore-unfixed: false
+
+      - name: Grype scan
+        uses: anchore/scan-action@v7.4.0
+        id: grype
+        with:
+          image: duplicity-backup:scan-target
+          fail-build: false
+          severity-cutoff: low
+          output-format: table
