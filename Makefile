@@ -1,4 +1,7 @@
 release:
-	docker buildx build --platform linux/arm64 -t duplicity-backup:latest .
-	docker tag duplicity-backup:latest frooko/duplicity-backup:latest
-	docker push frooko/duplicity-backup:latest
+	docker buildx create --name orbstack-multi --driver docker-container \
+		--platform linux/amd64,linux/arm64,linux/arm/v8 --use || true
+	docker buildx inspect --bootstrap
+	docker buildx build --platform linux/amd64,linux/arm64,linux/arm/v8 \
+		-t frooko/duplicity-backup:latest --push .
+	docker buildx rm orbstack-multi
