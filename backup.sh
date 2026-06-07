@@ -10,24 +10,32 @@
 
 B2_BUCKET_URL=b2://$B2_ACCOUNT_ID:$B2_APPLICATION_KEY@$B2_BUCKET_NAME
 
-# Whitespace/newline-separated list of patterns to exclude from backup.
-# Override via the BACKUP_EXCLUDES env var (compose `|` block scalar works well).
+# Whitespace/newline-separated lists of patterns to include/exclude from backup.
+# Override via BACKUP_INCLUDES/BACKUP_EXCLUDES env vars (compose `|` block scalar works well).
+DEFAULT_INCLUDES="
+**/.storage
+**/.storage/**
+"
 DEFAULT_EXCLUDES="
 **/.*
 /source/stacks/jellyfin/config/data/metadata
 /source/stacks/adwireguard/adguard/opt-adguard-work/data/querylog.json*
 "
+INCLUDES="${BACKUP_INCLUDES:-$DEFAULT_INCLUDES}"
 EXCLUDES="${BACKUP_EXCLUDES:-$DEFAULT_EXCLUDES}"
 
 set -f
-EXCLUDE_FLAGS=""
+SELECTION_FLAGS=""
+for pattern in $INCLUDES; do
+  SELECTION_FLAGS="$SELECTION_FLAGS --include $pattern"
+done
 for pattern in $EXCLUDES; do
-  EXCLUDE_FLAGS="$EXCLUDE_FLAGS --exclude $pattern"
+  SELECTION_FLAGS="$SELECTION_FLAGS --exclude $pattern"
 done
 set +f
 
-duplicity --full-if-older-than 7D $EXCLUDE_FLAGS "$SRC" "$B2_BUCKET_URL" --allow-source-mismatch
-duplicity backup $EXCLUDE_FLAGS "$SRC" "$B2_BUCKET_URL" --allow-source-mismatch
+duplicity --full-if-older-than 7D $SELECTION_FLAGS "$SRC" "$B2_BUCKET_URL" --allow-source-mismatch
+duplicity backup $SELECTION_FLAGS "$SRC" "$B2_BUCKET_URL" --allow-source-mismatch
 duplicity remove-older-than 8D --force "$B2_BUCKET_URL"
 
 date=$(date +"%Y-%m-%dT%H:%M:%S%:%z")
