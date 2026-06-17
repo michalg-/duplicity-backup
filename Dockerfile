@@ -1,7 +1,7 @@
 FROM alpine:3.24.1
 
 RUN apk add --update py-pip
-RUN apk add --no-cache duplicity gnupg dpkg curl
+RUN apk add --no-cache duplicity py3-pexpect gnupg dpkg curl
 
 RUN python -m pip config --global set global.break-system-packages true
 RUN pip install b2sdk
