@@ -50,14 +50,14 @@ A cron inside the container runs `backup.sh` every day at 04:00 UTC. It performs
 By default `.storage` directories are included before hidden paths are excluded:
 
 ```
-**/.storage
-**/.storage/**
+/source/**/.storage
+/source/**/.storage/**
 ```
 
 By default the following are skipped:
 
 ```
-**/.*
+/source/**/.*
 /source/stacks/jellyfin/config/data/metadata
 /source/stacks/adwireguard/adguard/opt-adguard-work/data/querylog.json*
 ```
@@ -67,10 +67,10 @@ Override by setting `BACKUP_INCLUDES` and/or `BACKUP_EXCLUDES`. YAML block scala
 ```yaml
 environment:
   BACKUP_INCLUDES: |
-    **/.storage
-    **/.storage/**
+    /source/**/.storage
+    /source/**/.storage/**
   BACKUP_EXCLUDES: |
-    **/.*
+    /source/**/.*
     /source/stacks/jellyfin/config/data/metadata
     /source/some/huge/cache
 ```
