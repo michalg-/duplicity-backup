@@ -1,6 +1,6 @@
 # duplicity-backup
 
-Containerized [duplicity](https://duplicity.gitlab.io/) backups to Backblaze B2, with a daily cron job and a Home Assistant `last-backup` timestamp ping. Multi-arch image (`amd64`, `arm64`, `arm/v7`) published to Docker Hub as [`frooko/duplicity-backup`](https://hub.docker.com/r/frooko/duplicity-backup).
+Containerized [duplicity](https://duplicity.gitlab.io/) backups to Backblaze B2, with a daily cron job and a Home Assistant `last-backup` timestamp ping. Multi-arch image (`amd64`, `arm64`, `arm/v7`) published to GitHub Container Registry as `ghcr.io/michalghomelab/duplicity-backup`.
 
 ## Quick start
 
@@ -8,7 +8,7 @@ Containerized [duplicity](https://duplicity.gitlab.io/) backups to Backblaze B2,
 # compose.yaml
 services:
   backup:
-    image: frooko/duplicity-backup:latest
+    image: ghcr.io/michalghomelab/duplicity-backup:latest
     restart: unless-stopped
     volumes:
       - /opt/stacks:/source/stacks
@@ -108,7 +108,7 @@ sudo -E duplicity restore --force \
 ## Building locally
 
 ```sh
-make release   # multi-arch buildx push to frooko/duplicity-backup:latest
+make release   # multi-arch buildx push to ghcr.io/michalghomelab/duplicity-backup:latest
 ```
 
 CI publishes tagged releases automatically on tag push (`X.Y.Z`).
