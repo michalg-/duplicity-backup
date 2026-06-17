@@ -42,49 +42,27 @@ A cron inside the container runs `backup.sh` every day at 04:00 UTC. It performs
 | `SRC`              | yes      | Path inside the container to back up (mount your data here)                 |
 | `HA_TOKEN`         | yes      | Home Assistant long-lived access token                                      |
 | `HA_URL`           | yes      | Home Assistant base URL                                                     |
-| `BACKUP_INCLUDES`  | no       | Whitespace/newline-separated list of patterns to include before excludes. See [Excludes](#excludes). |
 | `BACKUP_EXCLUDES`  | no       | Whitespace/newline-separated list of patterns to exclude. See [Excludes](#excludes). |
-| `BACKUP_FINAL_INCLUDES` | no  | Whitespace/newline-separated list of catch-all include patterns applied after excludes. |
 
 ### Excludes
-
-By default `.storage` directories are included before hidden paths are excluded:
-
-```
-/source/**/.storage
-/source/**/.storage/**
-```
 
 By default the following are skipped:
 
 ```
-/source/**/.*
 /source/stacks/jellyfin/config/data/metadata
 /source/stacks/adwireguard/adguard/opt-adguard-work/data/querylog.json*
 ```
 
-Everything else under `/source` is explicitly included at the end:
-
-```
-/source/**
-```
-
-Override by setting `BACKUP_INCLUDES` and/or `BACKUP_EXCLUDES`. YAML block scalars are the cleanest way:
+Everything else under `/source` is included by duplicity's default file selection behavior. Override by setting `BACKUP_EXCLUDES`. YAML block scalars are the cleanest way:
 
 ```yaml
 environment:
-  BACKUP_INCLUDES: |
-    /source/**/.storage
-    /source/**/.storage/**
   BACKUP_EXCLUDES: |
-    /source/**/.*
     /source/stacks/jellyfin/config/data/metadata
     /source/some/huge/cache
-  BACKUP_FINAL_INCLUDES: |
-    /source/**
 ```
 
-Patterns are passed to `duplicity --include`/`--exclude` in include, exclude, final-include order and follow its glob rules.
+Patterns are passed to `duplicity --exclude` and follow its glob rules.
 
 ## Restore
 

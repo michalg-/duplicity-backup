@@ -12,48 +12,26 @@ set -eu
 
 B2_BUCKET_URL=b2://$B2_ACCOUNT_ID:$B2_APPLICATION_KEY@$B2_BUCKET_NAME
 
-# Whitespace/newline-separated lists of patterns to include/exclude from backup.
-# Override via BACKUP_INCLUDES/BACKUP_EXCLUDES env vars (compose `|` block scalar works well).
-# Duplicity applies the first matching selection rule, so FINAL_INCLUDES catches
-# everything not explicitly excluded after the early includes/excludes are checked.
-DEFAULT_INCLUDES="
-$SRC/**/.storage
-$SRC/**/.storage/**
-"
+# Whitespace/newline-separated lists of patterns to exclude from backup.
+# Override via BACKUP_EXCLUDES env var (compose `|` block scalar works well).
 DEFAULT_EXCLUDES="
-$SRC/**/.*
 /source/stacks/jellyfin/config/data/metadata
 /source/stacks/adwireguard/adguard/opt-adguard-work/data/querylog.json*
 "
-DEFAULT_FINAL_INCLUDES="
-$SRC/**
-"
-INCLUDES="${BACKUP_INCLUDES:-$DEFAULT_INCLUDES}"
 EXCLUDES="${BACKUP_EXCLUDES:-$DEFAULT_EXCLUDES}"
-FINAL_INCLUDES="${BACKUP_FINAL_INCLUDES:-$DEFAULT_FINAL_INCLUDES}"
 
 echo "--------------[ Source Preflight ]--------------"
 echo "SRC $SRC"
 du -sh "$SRC" || true
 find "$SRC" -type f | wc -l | awk '{ print "SourceFilesBeforeFilters " $1 }'
-echo "Includes:"
-printf '%s\n' "$INCLUDES"
 echo "Excludes:"
 printf '%s\n' "$EXCLUDES"
-echo "Final includes:"
-printf '%s\n' "$FINAL_INCLUDES"
 echo "------------------------------------------------"
 
 set -f
 set --
-for pattern in $INCLUDES; do
-  set -- "$@" --include "$pattern"
-done
 for pattern in $EXCLUDES; do
   set -- "$@" --exclude "$pattern"
-done
-for pattern in $FINAL_INCLUDES; do
-  set -- "$@" --include "$pattern"
 done
 set +f
 
