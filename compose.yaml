@@ -19,3 +19,5 @@ services:
         /source/**/.*
         /source/stacks/jellyfin/config/data/metadata
         /source/stacks/adwireguard/adguard/opt-adguard-work/data/querylog.json*
+      BACKUP_FINAL_INCLUDES: |
+        /source/**
