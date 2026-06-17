@@ -26,6 +26,16 @@ $SRC/**/.*
 INCLUDES="${BACKUP_INCLUDES:-$DEFAULT_INCLUDES}"
 EXCLUDES="${BACKUP_EXCLUDES:-$DEFAULT_EXCLUDES}"
 
+echo "--------------[ Source Preflight ]--------------"
+echo "SRC $SRC"
+du -sh "$SRC" || true
+find "$SRC" -type f | wc -l | awk '{ print "SourceFilesBeforeFilters " $1 }'
+echo "Includes:"
+printf '%s\n' "$INCLUDES"
+echo "Excludes:"
+printf '%s\n' "$EXCLUDES"
+echo "------------------------------------------------"
+
 set -f
 set --
 for pattern in $INCLUDES; do
